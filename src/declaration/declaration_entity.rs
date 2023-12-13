@@ -7,8 +7,9 @@ pub struct DeclarationEntity {
     pub amount: f64,
     pub from: Currency,
     pub to: Currency,
-    pub rate: f64,
+    pub converted_amount: f64,
     pub amount_after_tax: f64,
-    pub total: f64,
     pub tax: f64,
+    pub tax_amount: f64,
+    pub total: f64,
 }

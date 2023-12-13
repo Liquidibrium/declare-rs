@@ -20,7 +20,7 @@ pub struct Config {
     // #[arg(value_enum, short('c'), long("config"))]
     // pub config_file: Option<PathBuf>,
     /// Tax
-    #[arg(short, long, default_value = "0.0")]
-    pub tax: f64,
+    #[arg(short, long)]
+    pub tax: Option<f64>,
 }
 

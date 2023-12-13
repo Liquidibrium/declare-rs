@@ -1,3 +1,4 @@
+use std::fs::create_dir_all;
 use std::path::PathBuf;
 
 const LOCAL_DIRECTORY: &str = ".config/declare";
@@ -13,6 +14,7 @@ pub fn config_path() -> anyhow::Result<PathBuf> {
 
     // create the local directory
     let local_dir = home_dir.join(LOCAL_DIRECTORY);
+    create_dir_all(local_dir.clone())?;
 
     // create the config file
     let config_file = local_dir.join(CONFIG_FILE_NAME);

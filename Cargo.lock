@@ -358,7 +358,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "declare"
+name = "declare-rs"
 version = "0.1.0"
 dependencies = [
  "anyhow",

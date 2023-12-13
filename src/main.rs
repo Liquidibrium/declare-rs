@@ -24,14 +24,16 @@ fn main() {
 
     // You can see how many times a particular flag or argument occurred
     // Note, only flags can have multiple occurrences
-    match cli.debug {
-        0 => println!("Debug mode is off"),
-        1 => println!("Debug mode is kind of on"),
-        2 => println!("Debug mode is on"),
-        _ => println!("Don't be crazy"),
-    }
+    // match cli.debug {
+    //     0 => println!("Debug mode is off"),
+    //     1 => println!("Debug mode is kind of on"),
+    //     2 => println!("Debug mode is on"),
+    //     _ => println!("Don't be crazy"),
+    // }
+    
     // Get config file
     let config_path = config_path().unwrap();
+    println!("Config path: {:?}", config_path);
     let config = if let Ok(f) = File::open(config_path.clone()) {
         // Parse config with serde
         match serde_yaml::from_reader::<_, <Config as ClapSerde>::Opt>(BufReader::new(f)) {
@@ -55,7 +57,7 @@ fn main() {
             open_cvs_file(&config).unwrap();
         }
         Some(Commands::Init {}) => {
-            save_config(&config, &config_path).unwrap();
+            save_config(&config, &config_path).expect("Error saving config");
         }
         Some(Commands::Add { date, amount, currency_from, currency_to, exchange_rate }) => {
             println!("Add date: {:?}", date);
