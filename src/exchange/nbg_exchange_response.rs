@@ -6,7 +6,7 @@ pub struct NbgExchangeResponse {
     pub currencies: Vec<Currency>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Currency {
     #[serde(rename = "rateFormated")]
     pub rate_formatted: String,

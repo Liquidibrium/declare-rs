@@ -2,15 +2,16 @@ pub mod commands;
 pub mod handlers;
 pub mod exchange;
 pub mod common;
+mod declaration;
 
 use std::fs::File;
 use std::io::BufReader;
 use clap::{Parser};
 use clap_serde_derive::ClapSerde;
-use crate::commands::config::Config;
 use crate::commands::{Cli, Commands};
-use crate::handlers::handlers::{add_new_transaction, print_exchange_rate, save_config, show_transactions};
-// const DEFAULT_CONFIG_FILE: &str = "default.conf";
+use crate::common::config::Config;
+use crate::common::consts::config_path;
+use crate::handlers::handlers::{add_new_transaction, open_cvs_file, print_exchange_rate, save_config, show_transactions};
 
 
 fn main() {
@@ -30,7 +31,8 @@ fn main() {
         _ => println!("Don't be crazy"),
     }
     // Get config file
-    let config = if let Ok(f) = File::open(&cli.config_path) {
+    let config_path = config_path().unwrap();
+    let config = if let Ok(f) = File::open(config_path) {
         // Parse config with serde
         match serde_yaml::from_reader::<_, <Config as ClapSerde>::Opt>(BufReader::new(f)) {
             // merge config already parsed from clap
@@ -49,12 +51,11 @@ fn main() {
             println!("Show format: {:?}", format);
             show_transactions(&config, format).unwrap();
         }
-        Some(Commands::Init { currency_from, currency_to, csv_file, tax }) => {
-            println!("Init currency_from: {:?}", currency_from);
-            println!("Init currency_to: {:?}", currency_to);
-            println!("Init csv_file: {:?}", csv_file);
-            println!("Init tax: {:?}", tax);
-            save_config(&config, &cli.config_path).unwrap();
+        Some(Commands::Open {}) => {
+            open_cvs_file(&config).unwrap();
+        }
+        Some(Commands::Init {}) => {
+            save_config(&config, &config_path).unwrap();
         }
         Some(Commands::Add { date, amount, currency_from, currency_to, exchange_rate }) => {
             println!("Add date: {:?}", date);

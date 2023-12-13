@@ -1,5 +1,4 @@
 use chrono::NaiveDate;
-use time::{Date, format_description};
 use crate::common::currency::Currency;
 use crate::exchange::nbg_exchange_response::NbgExchangeResponse;
 
