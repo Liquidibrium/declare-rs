@@ -1,4 +1,12 @@
+# declare-rs
 
+## install
+
+```shell
+cargo install --git  https://github.com/Liquidibrium/declare-rs
+```
+
+## examples
 
 ```shell
 # initialize the project
