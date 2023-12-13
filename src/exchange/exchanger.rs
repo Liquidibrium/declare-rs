@@ -22,6 +22,13 @@ impl NbgExchanger {
 
 impl Exchanger for NbgExchanger {
     fn exchange_rate(&self, from: &Currency, to: &Currency, date: NaiveDate, amount: f64) -> Result<f64, anyhow::Error> {
+        if to != &Currency::GEL {
+            return Err(anyhow::anyhow!("NbgExchanger | nbg.gov.ge does not support exchange to {}", to));
+        }
+        if from == to {
+            return Ok(amount);
+        }
+
         let date = date.format("[year]-[month]-[day]").to_string();
         let url = format!("https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?currencies={}&date={}", from, date);
         let response = self.client.get(url).send()?;

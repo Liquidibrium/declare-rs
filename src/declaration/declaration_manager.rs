@@ -74,7 +74,7 @@ impl DeclarationManager {
             total += record.amount_after_tax;
         }
 
-        total += amount_after_tax;
+        total += converted_amount;
 
         writer.serialize(DeclarationEntity {
             date: date.to_string(),
