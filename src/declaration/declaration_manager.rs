@@ -1,5 +1,4 @@
 use std::path::PathBuf;
-use crate::common::config::Config;
 use crate::common::consts::csv_path;
 use crate::common::currency::Currency;
 use crate::declaration::declaration_entity::DeclarationEntity;
@@ -7,35 +6,28 @@ use crate::declaration::declaration_entity::DeclarationEntity;
 
 const CSV_HEADERS: &str = "date,amount,from,to,rate,tax,amount_after_tax,total";
 
-enum FileCreationStatus{
+enum FileCreationStatus {
     Created,
     AlreadyExists,
 }
 
 pub struct DeclarationManager {
     csv_file: PathBuf,
-    from: Currency,
-    to: Currency,
-    tax: f64,
     csv_headers: Vec<String>,
 }
 
 
 impl DeclarationManager {
-    pub fn create(config: Config) -> anyhow::Result<Self> {
-        let csv_file = config.csv_file.unwrap_or(csv_path()?);
+    pub fn create(csv_file: Option<PathBuf>) -> anyhow::Result<Self> {
+        let csv_file = csv_file.unwrap_or_else(|| csv_path().unwrap());
         Ok(Self {
             csv_file,
-            from: config.currency_from.unwrap_or(Currency::USD),
-            to: config.currency_to.unwrap_or(Currency::GEL),
-            tax: config.tax,
             csv_headers: CSV_HEADERS.split(",").map(|s| s.to_string()).collect(),
         })
     }
 
-
     /// create new csv file if it does not exists and add header
-    pub fn init_declaration(&self, overwrite: bool) -> anyhow::Result<FileCreationStatus> {
+    fn init_declaration(&self, overwrite: bool) -> anyhow::Result<FileCreationStatus> {
         if self.csv_file.exists() && !overwrite {
             return Ok(FileCreationStatus::AlreadyExists);
         }
@@ -54,7 +46,7 @@ impl DeclarationManager {
                                rate: f64,
                                tax: f64) -> anyhow::Result<f64> {
         self.init_declaration(false)?;
-        
+
         // read old data, calculate new total, add new row and write to file
 
         let mut reader = csv::Reader::from_path(&self.csv_file)?;

@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use chrono::NaiveDate;
 use crate::common::config::Config;
+use crate::common::consts::csv_path;
 use crate::common::currency::Currency;
 use crate::common::output_format::OutputFormat;
 use crate::declaration::declaration_manager::DeclarationManager;
@@ -19,16 +20,15 @@ pub fn save_config(config: &Config, config_path: &PathBuf) -> anyhow::Result<()>
 }
 
 pub fn open_cvs_file(config: &Config) -> anyhow::Result<()> {
-    let csv_file = config.csv_file.unwrap_or_else(|| {
-        crate::common::consts::csv_path().unwrap()
-    });
+    let csv_file = config.csv_file.clone().unwrap_or_else(|| csv_path().unwrap());
+
     opener::open(csv_file)?;
     Ok(())
 }
 
 pub fn show_transactions(config: &Config, format: &OutputFormat) -> anyhow::Result<()> {
     println!("Show format: {:?} -> {}, {:?}", format, OutputFormat::CSV.to_string(), config);
-    let declaration_manager = DeclarationManager::create(config.clone())?;
+    let declaration_manager = DeclarationManager::create(config.csv_file.clone())?;
     // read the data
     let data = declaration_manager.show_declaration()?;
     // print the data
@@ -54,7 +54,7 @@ pub fn add_new_transaction(config: &Config,
                            from: &Option<Currency>,
                            to: &Option<Currency>,
                            exchange_rate: &Option<f64>) -> anyhow::Result<()> {
-    let declaration_manager = DeclarationManager::create(config.clone())?;
+    let declaration_manager = DeclarationManager::create(config.csv_file.clone())?;
 
     let from = from.unwrap_or(config.currency_from.unwrap_or(Currency::USD));
     let to = to.unwrap_or(config.currency_to.unwrap_or(Currency::GEL));

@@ -32,7 +32,7 @@ fn main() {
     }
     // Get config file
     let config_path = config_path().unwrap();
-    let config = if let Ok(f) = File::open(config_path) {
+    let config = if let Ok(f) = File::open(config_path.clone()) {
         // Parse config with serde
         match serde_yaml::from_reader::<_, <Config as ClapSerde>::Opt>(BufReader::new(f)) {
             // merge config already parsed from clap
