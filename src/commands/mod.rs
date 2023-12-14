@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use clap_serde_derive::ClapSerde;
 use crate::common::config::Config;

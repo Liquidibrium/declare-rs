@@ -1,20 +1,11 @@
 use std::fs::OpenOptions;
 use std::path::PathBuf;
 use crate::common::consts::csv_path;
-use crate::common::currency::Currency;
 use crate::declaration::declaration_entity::DeclarationEntity;
 
 
-const CSV_HEADERS: &str = "date,amount,from,to,converted_amount,amount_after_tax,tax,tax_amount,total";
-
-// pub enum FileCreationStatus {
-//     Created,
-//     AlreadyExists,
-// }
-
 pub struct DeclarationManager {
     csv_file: PathBuf,
-    csv_headers: Vec<&'static str>,
 }
 
 
@@ -24,28 +15,13 @@ impl DeclarationManager {
         println!("CSV file: {:?}", csv_file);
         Ok(Self {
             csv_file,
-            csv_headers: CSV_HEADERS.split(",").collect(),
         })
     }
 
-    // /// create new csv file if it does not exists and add header
-    // fn init_declaration(&self, overwrite: bool) -> anyhow::Result<FileCreationStatus> {
-    //     if self.csv_file.exists() && !overwrite {
-    //         println!("File already exists: {:?}", self.csv_file);
-    //         return Ok(FileCreationStatus::AlreadyExists);
-    //     }
-    //     println!("Creating file: {:?}, with headers {:?}", self.csv_file, self.csv_headers);
-    //
-    //     let mut writer = csv::Writer::from_path(&self.csv_file)?;
-    //
-    //     writer.write_record(self.csv_headers.clone())?;
-    //     writer.flush()?;
-    //     Ok(FileCreationStatus::Created)
-    // }
 
     pub fn add_new_transaction(&self,
                                should_initialize: bool,
-                              declaration_entity: DeclarationEntity) -> anyhow::Result<()> {
+                               declaration_entity: DeclarationEntity) -> anyhow::Result<()> {
         // read old data, calculate new total, add new row and write to file
         let mut writer = if should_initialize {
 
