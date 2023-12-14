@@ -11,5 +11,6 @@ pub struct DeclarationEntity {
     pub amount_after_tax: f64,
     pub tax: f64,
     pub tax_amount: f64,
+    pub rate: f64,
     pub total: f64,
 }

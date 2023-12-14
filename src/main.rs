@@ -30,7 +30,7 @@ fn main() {
     //     2 => println!("Debug mode is on"),
     //     _ => println!("Don't be crazy"),
     // }
-    
+
     // Get config file
     let config_path = config_path().unwrap();
     println!("Config path: {:?}", config_path);
@@ -50,29 +50,29 @@ fn main() {
     // matches just as you would the top level cmd
     match &cli.command {
         Some(Commands::Show { format }) => {
-            println!("Show format: {:?}", format);
-            show_transactions(&config, format).unwrap();
+            show_transactions(&config, format).unwrap_or_else(|err| {
+                eprintln!("Error showing transactions: {}", err);
+            });
         }
         Some(Commands::Open {}) => {
-            open_cvs_file(&config).unwrap();
+            open_cvs_file(&config).unwrap_or_else(|err| {
+                eprintln!("error opening file: {}", err);
+            });
         }
         Some(Commands::Init {}) => {
-            save_config(&config, &config_path).expect("Error saving config");
+            save_config(&config, &config_path).unwrap_or_else(|err| {
+                eprintln!("Error saving config: {}", err);
+            });
         }
         Some(Commands::Add { date, amount, currency_from, currency_to, exchange_rate }) => {
-            println!("Add date: {:?}", date);
-            println!("Add amount: {:?}", amount);
-            println!("Add currency_from: {:?}", currency_from);
-            println!("Add currency_to: {:?}", currency_to);
-            println!("Add exchange_rate: {:?}", exchange_rate);
-            add_new_transaction(&config, date, amount, currency_from, currency_to, exchange_rate).unwrap();
+            add_new_transaction(&config, date, amount, currency_from, currency_to, exchange_rate).unwrap_or_else(|err| {
+                eprintln!("Error adding new transaction: {}", err);
+            });
         }
         Some(Commands::Exchange { currency_from, currency_to, amount, date }) => {
-            println!("Exchange currency_from: {:?}", currency_from);
-            println!("Exchange currency_to: {:?}", currency_to);
-            println!("Exchange amount: {:?}", amount);
-            println!("Exchange date: {:?}", date);
-            print_exchange_rate(&config, currency_from, currency_to, date, amount).unwrap();
+            print_exchange_rate(&config, currency_from, currency_to, date, amount).unwrap_or_else(|err| {
+                eprintln!("Error printing exchange rate: {}", err);
+            });
         }
         None => {}
     }

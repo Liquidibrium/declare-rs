@@ -21,6 +21,7 @@ pub struct DeclarationManager {
 impl DeclarationManager {
     pub fn create(csv_file: Option<PathBuf>) -> anyhow::Result<Self> {
         let csv_file = csv_file.unwrap_or_else(|| csv_path().unwrap());
+        println!("CSV file: {:?}", csv_file);
         Ok(Self {
             csv_file,
             csv_headers: CSV_HEADERS.split(",").collect(),
@@ -43,19 +44,10 @@ impl DeclarationManager {
     // }
 
     pub fn add_new_transaction(&self,
-                               date: &str,
-                               amount: f64,
-                               from: Currency,
-                               to: Currency,
-                               converted_amount: f64,
-                               amount_after_tax: f64,
-                               tax: f64,
-                               tax_amount: f64) -> anyhow::Result<f64> {
-        let records = self.get_existing_declarations()?;
-        println!("records size: {:?}", records.len());
-
+                               should_initialize: bool,
+                              declaration_entity: DeclarationEntity) -> anyhow::Result<()> {
         // read old data, calculate new total, add new row and write to file
-        let mut writer = if records.is_empty() {
+        let mut writer = if should_initialize {
 
             // If the file is empty, create a new file with a header
             csv::WriterBuilder::new()
@@ -69,26 +61,9 @@ impl DeclarationManager {
                 .from_writer(file)
         };
 
-        let mut total = 0.0;
-        for record in records.iter() {
-            total += record.amount_after_tax;
-        }
+        writer.serialize(declaration_entity)?;
 
-        total += converted_amount;
-
-        writer.serialize(DeclarationEntity {
-            date: date.to_string(),
-            amount,
-            from,
-            to,
-            converted_amount,
-            tax,
-            tax_amount,
-            amount_after_tax,
-            total,
-        })?;
-
-        Ok(total)
+        Ok(())
     }
 
     pub fn get_existing_declarations(&self) -> anyhow::Result<Vec<DeclarationEntity>> {

@@ -29,7 +29,7 @@ impl Exchanger for NbgExchanger {
             return Ok(amount);
         }
 
-        let date = date.format("[year]-[month]-[day]").to_string();
+        let date = date.format("%Y-%m-%d").to_string();
         let url = format!("https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?currencies={}&date={}", from, date);
         let response = self.client.get(url).send()?;
         let response = response.json::<Vec<NbgExchangeResponse>>()?;

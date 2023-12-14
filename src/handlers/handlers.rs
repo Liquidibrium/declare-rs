@@ -4,6 +4,7 @@ use crate::common::config::Config;
 use crate::common::consts::csv_path;
 use crate::common::currency::Currency;
 use crate::common::output_format::OutputFormat;
+use crate::declaration::declaration_entity::DeclarationEntity;
 use crate::declaration::declaration_manager::DeclarationManager;
 use crate::exchange::exchanger::{Exchanger, NbgExchanger};
 
@@ -56,13 +57,34 @@ pub fn add_new_transaction(config: &Config,
     let exchange_rate = exchange_rate.unwrap_or_else(|| {
         NbgExchanger::new().exchange_rate(&from, &to, native_date, 1.0).unwrap()
     });
-    let tax = config.tax.unwrap_or(0.0);
-    let exchanged_amount = exchange_rate * amount;
-    let tax_amount = exchanged_amount * tax / 100.0;
-    let amount_after_tax = exchanged_amount - tax;
 
-    let total = declaration_manager.add_new_transaction(date, *amount, from, to, exchanged_amount,amount_after_tax, tax, tax_amount)?;
-    println!("Total: {}", total);
+    println!("{} {} = {} {}", 1.0, from, exchange_rate, to);
+
+    let tax = config.tax.unwrap_or(0.0);
+    let converted_amount = exchange_rate * amount;
+    let tax_amount = converted_amount * tax / 100.0;
+    let amount_after_tax = converted_amount - tax_amount;
+    let records = declaration_manager.get_existing_declarations()?;
+
+    let total = match records.last() {
+        Some(last) => last.total,
+        None => 0.0
+    } + converted_amount;
+
+    declaration_manager.add_new_transaction(records.is_empty(),
+                                            DeclarationEntity {
+                                                date: date.to_string(),
+                                                amount: *amount,
+                                                from,
+                                                to,
+                                                converted_amount,
+                                                tax,
+                                                tax_amount,
+                                                amount_after_tax,
+                                                total,
+                                                rate: exchange_rate,
+                                            })?;
+    println!("Total: {} {} ", total, to);
     Ok(())
 }
 
@@ -72,12 +94,10 @@ pub fn print_exchange_rate(_config: &Config,
                            date: &String,
                            amount: &f64,
 ) -> anyhow::Result<()> {
-    println!("{} {} = ? {}", amount, from, to);
-
     let date = NaiveDate::parse_from_str(date, "%Y-%m-%d").unwrap();
     let exchange_rate_amount = NbgExchanger::new().exchange_rate(from, to, date, *amount)?;
 
-    println!("{} {} = {} {}", amount, from, exchange_rate_amount, to);
+    println!("{} {} = {} {} - Date: {}", amount, from, exchange_rate_amount, to, date);
 
     Ok(())
 }
