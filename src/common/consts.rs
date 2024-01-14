@@ -18,6 +18,7 @@ pub fn config_path() -> anyhow::Result<PathBuf> {
 
     // create the config file
     let config_file = local_dir.join(CONFIG_FILE_NAME);
+    println!("config_file: {:?}", config_file);
     Ok(config_file)
 }
 

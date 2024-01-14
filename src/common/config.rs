@@ -1,3 +1,4 @@
+use std::fmt::{Debug, Formatter};
 use std::path::PathBuf;
 use clap_serde_derive::ClapSerde;
 use serde::{Deserialize, Serialize};
@@ -24,3 +25,26 @@ pub struct Config {
     pub tax: Option<f64>,
 }
 
+
+impl Clone for ClapSerdeOptionalConfig {
+    fn clone(&self) -> Self {
+        Self {
+            currency_from: self.currency_from.clone(),
+            currency_to: self.currency_to.clone(),
+            csv_file: self.csv_file.clone(),
+            tax: self.tax.clone(),
+        }
+    }
+}
+
+
+impl Debug for ClapSerdeOptionalConfig {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ClapSerdeOptionalConfig")
+            .field("currency_from", &self.currency_from)
+            .field("currency_to", &self.currency_to)
+            .field("csv_file", &self.csv_file)
+            .field("tax", &self.tax)
+            .finish()
+    }
+}
