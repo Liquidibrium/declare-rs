@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 use chrono::NaiveDate;
+use comfy_table::Table;
 use crate::common::config::Config;
 use crate::common::consts::csv_path;
 use crate::common::currency::Currency;
@@ -39,15 +40,35 @@ pub fn show_transactions(config: &Config, format: &OutputFormat) -> anyhow::Resu
 
     match format {
         OutputFormat::CSV => {
-            for row in data {
-                println!("{:?}", row);
-            }
+            let table = generate_table(&data);
+            println!("{table}");
         }
         OutputFormat::JSON => {
             println!("{}", serde_json::to_string(&data)?);
         }
     }
     Ok(())
+}
+
+fn generate_table(data: &Vec<DeclarationEntity>) -> String {
+    let mut table = Table::new();
+    table
+        .set_header(vec!["#", "time", "amount from", "converted to", "tax", "tax amount", "amount after tax", "total"]);
+
+    for (i, record) in data.iter().enumerate() {
+        table.add_row(vec![
+            format!("{}", i + 1),
+            record.date.to_string(),
+            format!("{} {}", record.amount, record.from),
+            format!("{} {}", record.converted_amount, record.to),
+            format!("{} %", record.tax),
+            format!("{} {}", record.tax_amount, record.to),
+            format!("{} {}", record.amount_after_tax, record.to),
+            format!("{} {}", record.total, record.to),
+        ]);
+    }
+
+    return table.to_string();
 }
 
 
