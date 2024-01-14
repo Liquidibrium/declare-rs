@@ -17,6 +17,10 @@ impl NbgExchanger {
             client: reqwest::blocking::Client::new()
         }
     }
+
+    fn format_date(date: NaiveDate) -> String {
+        date.format("%Y-%m-%d").to_string()
+    }
 }
 
 
@@ -29,7 +33,7 @@ impl Exchanger for NbgExchanger {
             return Ok(amount);
         }
 
-        let date = date.format("%Y-%m-%d").to_string();
+        let date = Self::format_date(date);
         let url = format!("https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json/?currencies={}&date={}", from, date);
         let response = self.client.get(url).send()?;
         let response = response.json::<Vec<NbgExchangeResponse>>()?;

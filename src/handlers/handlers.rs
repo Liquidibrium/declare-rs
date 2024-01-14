@@ -102,7 +102,7 @@ pub fn add_new_transaction(config: &Config,
 
     declaration_manager.add_new_transaction(records.is_empty(),
                                             DeclarationEntity {
-                                                date: date.to_string(),
+                                                date: format_date(native_date).to_string(),
                                                 amount: *amount,
                                                 from,
                                                 to,
@@ -115,6 +115,10 @@ pub fn add_new_transaction(config: &Config,
                                             })?;
     println!("Total: {} {} ", total, to);
     Ok(())
+}
+
+fn format_date(date: NaiveDate) -> String {
+    date.format("%Y-%m-%d").to_string()
 }
 
 fn parse_date(date: &String, formats: Vec<&str>) -> anyhow::Result<NaiveDate> {
